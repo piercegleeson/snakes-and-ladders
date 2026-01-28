@@ -202,8 +202,9 @@ function App() {
   const [diceValue, setDiceValue] = useState(null)
   const [message, setMessage] = useState('')
   const [isRolling, setIsRolling] = useState(false)
-  const [winner, setWinner] = useState(null)
+  const [gameResult, setGameResult] = useState(null) // 'team' | 'board' | null
   const [slidingPlayer, setSlidingPlayer] = useState(null)
+  const [rollCount, setRollCount] = useState(0)
 
   const startGame = (count) => {
     const initialPositions = Array(count).fill(0)
@@ -213,10 +214,11 @@ function App() {
     animatedPosRef.current = initialPositions
     setCurrentPlayer(0)
     setDiceValue(null)
-    setMessage(`${PLAYER_NAMES[0]}'s turn. Roll the dice!`)
+    setMessage(`Team effort! ${PLAYER_NAMES[0]} rolls first.`)
     setGamePhase('playing')
-    setWinner(null)
+    setGameResult(null)
     setSlidingPlayer(null)
+    setRollCount(0)
   }
 
   // Update animated position (both state and ref)
@@ -263,6 +265,8 @@ function App() {
   const rollDice = () => {
     if (isRolling || gamePhase !== 'playing') return
 
+    const newRollCount = rollCount + 1
+    setRollCount(newRollCount)
     setIsRolling(true)
     const roll = Math.floor(Math.random() * 6) + 1
     setDiceValue(roll)
@@ -271,14 +275,14 @@ function App() {
       const currentPos = animatedPosRef.current[currentPlayer]
       let newPosition = currentPos + roll
 
+      // Check if team wins (any player reaches 100+)
       if (newPosition >= 100) {
-        // Animate to 100 and win
         animateMovement(currentPlayer, currentPos, 100, () => {
           const newPositions = [...playerPositions]
           newPositions[currentPlayer] = 100
           setPlayerPositions(newPositions)
-          setMessage(`${PLAYER_NAMES[currentPlayer]} rolled ${roll} and reached 100! ${PLAYER_NAMES[currentPlayer]} wins!`)
-          setWinner(currentPlayer)
+          setMessage(`${PLAYER_NAMES[currentPlayer]} reached 100! Team wins!`)
+          setGameResult('team')
           setGamePhase('finished')
           setIsRolling(false)
         })
@@ -293,38 +297,34 @@ function App() {
         // Check for snakes or ladders
         if (SNAKES[landedOn]) {
           const snakeEnd = SNAKES[landedOn]
-          finalMessage += `Landed on ${landedOn}. Snake! Down to ${snakeEnd}`
+          finalMessage += `Snake! Down to ${snakeEnd}`
           setMessage(finalMessage)
 
-          // Pause, then slide down the snake (direct movement, not step-by-step)
           setTimeout(() => {
             setSlidingPlayer(currentPlayer)
             updateAnimatedPos(currentPlayer, snakeEnd)
             const newPositions = [...playerPositions]
             newPositions[currentPlayer] = snakeEnd
             setPlayerPositions(newPositions)
-            // Wait for slide animation to complete before next turn
             setTimeout(() => {
               setSlidingPlayer(null)
-              nextTurn()
+              finishTurn(newRollCount)
             }, 600)
           }, 400)
         } else if (LADDERS[landedOn]) {
           const ladderEnd = LADDERS[landedOn]
-          finalMessage += `Landed on ${landedOn}. Ladder! Up to ${ladderEnd}`
+          finalMessage += `Ladder! Up to ${ladderEnd}`
           setMessage(finalMessage)
 
-          // Pause, then climb up the ladder (direct movement, not step-by-step)
           setTimeout(() => {
             setSlidingPlayer(currentPlayer)
             updateAnimatedPos(currentPlayer, ladderEnd)
             const newPositions = [...playerPositions]
             newPositions[currentPlayer] = ladderEnd
             setPlayerPositions(newPositions)
-            // Wait for climb animation to complete before next turn
             setTimeout(() => {
               setSlidingPlayer(null)
-              nextTurn()
+              finishTurn(newRollCount)
             }, 600)
           }, 400)
         } else {
@@ -333,16 +333,25 @@ function App() {
           const newPositions = [...playerPositions]
           newPositions[currentPlayer] = landedOn
           setPlayerPositions(newPositions)
-          nextTurn()
+          finishTurn(newRollCount)
         }
       })
     }, 500)
   }
 
-  const nextTurn = () => {
+  const finishTurn = (currentRollCount) => {
+    // Check if board wins (exceeded max rolls)
+    const maxRolls = playerCount * 30
+    if (currentRollCount >= maxRolls) {
+      setMessage(`Roll ${currentRollCount} of ${maxRolls}. Out of rolls! The board wins!`)
+      setGameResult('board')
+      setGamePhase('finished')
+      setIsRolling(false)
+      return
+    }
+
     const next = (currentPlayer + 1) % playerCount
     setCurrentPlayer(next)
-    setMessage(prev => prev + ` → ${PLAYER_NAMES[next]}'s turn`)
     setIsRolling(false)
   }
 
@@ -354,8 +363,9 @@ function App() {
     setCurrentPlayer(0)
     setDiceValue(null)
     setMessage('')
-    setWinner(null)
+    setGameResult(null)
     setSlidingPlayer(null)
+    setRollCount(0)
   }
 
   const renderBoard = () => {
@@ -404,12 +414,17 @@ function App() {
     return playersAtSamePos
   }
 
+  const maxRolls = playerCount * 30
+  const rollsRemaining = maxRolls - rollCount
+
   if (gamePhase === 'setup') {
     return (
       <div className="game-container">
         <h1>Snakes & Ladders</h1>
+        <p className="coop-subtitle">Cooperative Team Game</p>
         <div className="setup-screen">
           <h2>How many players?</h2>
+          <p className="setup-rules">Get any player to 100 within shared rolls to win!</p>
           <div className="player-select">
             {[2, 3, 4].map(count => (
               <button key={count} onClick={() => startGame(count)} className="player-count-btn">
@@ -417,6 +432,7 @@ function App() {
                 <div className="player-preview">
                   {PLAYER_COLORS.slice(0, count).join(' ')}
                 </div>
+                <div className="roll-preview">{count * 30} rolls</div>
               </button>
             ))}
           </div>
@@ -430,11 +446,17 @@ function App() {
       <h1>Snakes & Ladders</h1>
 
       <div className="game-info">
+        {/* Roll counter */}
+        <div className={`roll-counter ${rollsRemaining <= 10 ? 'danger' : ''}`}>
+          <span className="roll-label">Rolls remaining:</span>
+          <span className="roll-value">{rollsRemaining}</span>
+        </div>
+
         <div className="player-status">
           {playerPositions.map((pos, idx) => (
             <div
               key={idx}
-              className={`player-info ${idx === currentPlayer && gamePhase === 'playing' ? 'active' : ''} ${idx === winner ? 'winner' : ''}`}
+              className={`player-info ${idx === currentPlayer && gamePhase === 'playing' ? 'active' : ''}`}
             >
               <span className="player-icon">{PLAYER_COLORS[idx]}</span>
               <span className="player-name">{PLAYER_NAMES[idx]}</span>
@@ -457,6 +479,11 @@ function App() {
           )}
         </div>
         <p className="message">{message}</p>
+        {gameResult && (
+          <p className={`game-result ${gameResult}`}>
+            {gameResult === 'team' ? '🎉 Team Wins! 🎉' : '🐍 The Board Wins! 🐍'}
+          </p>
+        )}
       </div>
 
       <div className="board-wrapper">

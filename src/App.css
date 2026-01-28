@@ -20,6 +20,18 @@ h1 {
   color: #333;
 }
 
+.coop-subtitle {
+  margin: 0;
+  color: #666;
+  font-style: italic;
+}
+
+.setup-rules {
+  margin: 0;
+  color: #555;
+  font-size: 1rem;
+}
+
 /* Setup Screen */
 .setup-screen {
   display: flex;
@@ -59,12 +71,73 @@ h1 {
   font-size: 1.5rem;
 }
 
+.roll-preview {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
 /* Game Info */
 .game-info {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+}
+
+/* Roll Counter */
+.roll-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: #e3f2fd;
+  border: 2px solid #2196F3;
+  border-radius: 8px;
+  font-size: 1.1rem;
+}
+
+.roll-counter.danger {
+  background: #ffebee;
+  border-color: #f44336;
+  animation: pulse-danger 1s ease-in-out infinite;
+}
+
+@keyframes pulse-danger {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.roll-label {
+  color: #555;
+}
+
+.roll-value {
+  font-weight: bold;
+  font-size: 1.3rem;
+  color: #2196F3;
+}
+
+.roll-counter.danger .roll-value {
+  color: #f44336;
+}
+
+/* Game Result */
+.game-result {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.game-result.team {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.game-result.board {
+  background: #ffebee;
+  color: #c62828;
 }
 
 .player-status {
