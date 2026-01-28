@@ -1,0 +1,266 @@
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+h1 {
+  margin: 0;
+  color: #333;
+}
+
+/* Setup Screen */
+.setup-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.setup-screen h2 {
+  margin: 0;
+  color: #555;
+}
+
+.player-select {
+  display: flex;
+  gap: 1rem;
+}
+
+.player-count-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem;
+  font-size: 1.2rem;
+  background: #4CAF50;
+  min-width: 140px;
+}
+
+.player-count-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+.player-preview {
+  font-size: 1.5rem;
+}
+
+/* Game Info */
+.game-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.player-status {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f0f0f0;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.player-info.active {
+  border-color: #4CAF50;
+  background: #e8f5e9;
+  transform: scale(1.05);
+}
+
+.player-info.winner {
+  border-color: #FFD700;
+  background: #fff9c4;
+  animation: winner-glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes winner-glow {
+  from { box-shadow: 0 0 5px #FFD700; }
+  to { box-shadow: 0 0 20px #FFD700; }
+}
+
+.player-icon {
+  font-size: 1.5rem;
+}
+
+.player-name {
+  font-weight: bold;
+  color: #333;
+}
+
+.player-pos {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Dice */
+.dice-area {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dice {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border: 3px solid #333;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.dice.rolling {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background: #45a049;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.message {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  text-align: center;
+  max-width: 600px;
+}
+
+/* Board */
+.board-wrapper {
+  position: relative;
+  overflow: visible;
+}
+
+.board-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  border: 3px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.board-row {
+  display: flex;
+}
+
+.square {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #f9f9f9;
+  font-size: 0.7rem;
+}
+
+.square:nth-child(odd) {
+  background: #e8e8e8;
+}
+
+.board-row:nth-child(odd) .square:nth-child(even) {
+  background: #e8e8e8;
+}
+
+.board-row:nth-child(odd) .square:nth-child(odd) {
+  background: #f9f9f9;
+}
+
+.square-number {
+  font-weight: bold;
+  color: #666;
+  position: relative;
+  z-index: 5;
+  text-shadow: 0 0 3px white, 0 0 3px white;
+}
+/*
+.snake-head {
+  background: #ffcccc !important;
+}
+
+.ladder-bottom {
+  background: #ccffcc !important;
+}
+*/
+.snake-indicator,
+.ladder-indicator {
+  font-size: 0.55rem;
+  margin-top: 1px;
+}
+
+/* Animated player tokens */
+.player-token {
+  position: absolute;
+  font-size: 1.5rem;
+  transform: translate(-50%, -50%);
+  transition: left 0.15s ease-out, top 0.15s ease-out;
+  z-index: 10;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+}
+
+.player-token.sliding {
+  transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+}
