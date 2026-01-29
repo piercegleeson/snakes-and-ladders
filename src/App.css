@@ -250,6 +250,35 @@ button:disabled {
   max-width: 600px;
 }
 
+/* Leg Up Choice */
+.leg-up-choice {
+  display: flex;
+  gap: 1rem;
+}
+
+.leg-up-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.leg-up-btn.accept {
+  background: #2196F3;
+}
+
+.leg-up-btn.accept:hover {
+  background: #1976D2;
+}
+
+.leg-up-btn.decline {
+  background: #757575;
+}
+
+.leg-up-btn.decline:hover {
+  background: #616161;
+}
+
 /* Board */
 .board-wrapper {
   position: relative;
@@ -280,7 +309,6 @@ button:disabled {
 .square {
   width: 60px;
   height: 60px;
-  border: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -290,10 +318,39 @@ button:disabled {
   font-size: 0.7rem;
 }
 
+.square.color-green {
+  background: #7b7328;
+}
+
+.square.color-red {
+  background: #ae3034;
+}
+
+.square.color-blue {
+  background: #96ad99;
+}
+
+.square.color-yellow {
+  background: #af8d36;
+}
+/*
 .square:nth-child(odd) {
   background: #e8e8e8;
 }
+*/
+/*
+.square:nth-child(1n){
+  background:yellow;
+}
+.square:nth-child(2n){
+  background:blue;
+}
+.square:nth-child(3n){
+  background:red;
+}
+*/
 
+/*
 .board-row:nth-child(odd) .square:nth-child(even) {
   background: #e8e8e8;
 }
@@ -301,13 +358,24 @@ button:disabled {
 .board-row:nth-child(odd) .square:nth-child(odd) {
   background: #f9f9f9;
 }
+*/
+.board-row:not(:last-child) .square{
+  border-bottom:2px solid #000;
+}
+.board-row:nth-child(odd) .square:last-child{
+  border-bottom:0;
+}
+.board-row:nth-child(even) .square:first-child{
+  border-bottom:0;
+}
+
+
 
 .square-number {
   font-weight: bold;
-  color: #666;
+  color: #000;
   position: relative;
   z-index: 5;
-  text-shadow: 0 0 3px white, 0 0 3px white;
 }
 /*
 .snake-head {
