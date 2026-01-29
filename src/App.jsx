@@ -405,7 +405,7 @@ function App() {
   // After a player moves, check for boost offers:
   // "Leg up" - landed on same square as another player
   // "Hand up" - landed on the square directly above another player
-  const checkBoostOffers = (movedPlayerIdx, newPositions) => {
+  const checkBoostOffers = (movedPlayerIdx, newPositions, excludeType = null) => {
     const landedSquare = newPositions[movedPlayerIdx]
     if (landedSquare <= 0) return
 
@@ -417,11 +417,11 @@ function App() {
         if (otherPos <= 0 || otherPos > 90) continue
 
         // Leg up: landed on the same square
-        if (otherPos === landedSquare) {
+        if (excludeType !== 'legUp' && otherPos === landedSquare) {
           updated[i] = { giverIdx: movedPlayerIdx, type: 'legUp' }
         }
         // Hand up: landed directly above another player
-        else if (getSquareAbove(otherPos) === landedSquare) {
+        else if (excludeType !== 'handUp' && getSquareAbove(otherPos) === landedSquare) {
           updated[i] = { giverIdx: movedPlayerIdx, type: 'handUp' }
         }
       }
@@ -439,6 +439,9 @@ function App() {
     const boostName = offer.type === 'legUp' ? 'leg up' : 'hand up'
 
     // Clear this player's offer
+    // Prevent chain boosting: if you received a leg up, you can't give a hand up (and vice versa)
+    const excludeType = offer.type === 'legUp' ? 'handUp' : 'legUp'
+
     setLegUpOffers(prev => {
       const updated = [...prev]
       updated[currentPlayer] = null
@@ -481,7 +484,7 @@ function App() {
           const updatedPositions = [...newPositions]
           updatedPositions[currentPlayer] = snakeEnd
           setPlayerPositions(updatedPositions)
-          checkBoostOffers(currentPlayer, updatedPositions)
+          checkBoostOffers(currentPlayer, updatedPositions, excludeType)
           setTimeout(() => {
             setSlidingPlayer(null)
             finishTurn(rollCount)  // Leg up doesn't count as a roll
@@ -496,14 +499,14 @@ function App() {
           const updatedPositions = [...newPositions]
           updatedPositions[currentPlayer] = ladderEnd
           setPlayerPositions(updatedPositions)
-          checkBoostOffers(currentPlayer, updatedPositions)
+          checkBoostOffers(currentPlayer, updatedPositions, excludeType)
           setTimeout(() => {
             setSlidingPlayer(null)
             finishTurn(rollCount)
           }, 600)
         }, 400)
       } else {
-        checkBoostOffers(currentPlayer, newPositions)
+        checkBoostOffers(currentPlayer, newPositions, excludeType)
         finishTurn(rollCount)
       }
     }, 600)
