@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 const SNAKES = {
@@ -27,7 +27,7 @@ const LADDERS = {
 }
 
 const PLAYER_COLORS = ['🔴', '🔵', '🟢', '🟡']
-const PLAYER_NAMES = ['Red', 'Blue', 'Green', 'Yellow']
+const PLAYER_NAMES = ['Player One', 'Player Two', 'Player Three', 'Player Four']
 
 const SQUARE_SIZE = 60
 const BOARD_SIZE = SQUARE_SIZE * 10
@@ -59,7 +59,7 @@ function getSquareAbove(squareNum) {
   return rowColToSquare(newRow, col)
 }
 
-const SQUARE_COLORS = ['color-green', 'color-red', 'color-blue', 'color-yellow']
+const SQUARE_COLORS = ['color-grey', 'color-pink', 'color-blue', 'color-brown']
 
 // Generate a random color map ensuring no horizontal or vertical repeats
 function generateColorMap() {
@@ -225,30 +225,32 @@ function Ladder({ from, to }) {
 
   return (
     <g className="ladder">
-      <line
-        x1={rail1Start.x} y1={rail1Start.y}
-        x2={rail1End.x} y2={rail1End.y}
-        stroke="#8B4513"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
-      <line
-        x1={rail2Start.x} y1={rail2Start.y}
-        x2={rail2End.x} y2={rail2End.y}
-        stroke="#8B4513"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
       {rungs.map((rung, i) => (
         <line
           key={i}
           x1={rung.x1} y1={rung.y1}
           x2={rung.x2} y2={rung.y2}
-          stroke="#A0522D"
+          stroke="#4a5e45"
           strokeWidth="3"
           strokeLinecap="round"
         />
       ))}
+      <line
+        x1={rail1Start.x} y1={rail1Start.y}
+        x2={rail1End.x} y2={rail1End.y}
+        stroke="#4a5e45"
+        strokeWidth="4"
+        strokeLinecap="round"
+        className = "ladder-vertical"
+      />
+      <line
+        x1={rail2Start.x} y1={rail2Start.y}
+        x2={rail2End.x} y2={rail2End.y}
+        stroke="#4a5e45"
+        strokeWidth="4"
+        strokeLinecap="round"
+        className = "ladder-vertical"
+      />
     </g>
   )
 }
@@ -259,7 +261,7 @@ function Snake({ from, to }) {
   const { path, tail, head } = generateSnakePath(start, end)
 
   // Calculate tail polygon points (tapers from body width to point)
-  const outerWidth = 6  // Half of outer stroke width (12/2)
+  const outerWidth = 5  // Half of outer stroke width (12/2)
   const innerWidth = 4  // Half of inner stroke width (8/2)
 
   // Perpendicular to tail direction
@@ -285,23 +287,23 @@ function Snake({ from, to }) {
       <path
         d={path}
         fill="none"
-        stroke="#2d5a27"
-        strokeWidth="12"
+        stroke="#4a5e45"
+        strokeWidth="10"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d={path}
         fill="none"
-        stroke="#4a9c3d"
+        stroke="#C4893A"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <polygon points={outerTail} fill="#2d5a27" />
-      <polygon points={innerTail} fill="#4a9c3d" />
-      <circle cx={eyeLeftX} cy={eyeLeftY} r="2" fill="#ff0000" />
-      <circle cx={eyeRightX} cy={eyeRightY} r="2" fill="#ff0000" />
+      <polygon points={outerTail} fill="#4a5e45" />
+      <polygon points={innerTail} fill="#C4893A" />
+      <circle cx={eyeLeftX} cy={eyeLeftY} r="2" fill="#e8e2d9" />
+      <circle cx={eyeRightX} cy={eyeRightY} r="2" fill="#e8e2d9" />
     </g>
   )
 }
@@ -342,6 +344,21 @@ function App() {
   const [colorMap, setColorMap] = useState(() => generateColorMap())
   const [legUpOffers, setLegUpOffers] = useState([])  // legUpOffers[i] = index of player who gave the leg up, or null
   const [showingLegUp, setShowingLegUp] = useState(false)
+
+  // Responsive board scaling
+  const boardContainerRef = useRef(null)
+  const [boardScale, setBoardScale] = useState(1)
+
+  useEffect(() => {
+    const container = boardContainerRef.current
+    if (!container) return
+    const observer = new ResizeObserver(([entry]) => {
+      const availableWidth = entry.contentRect.width
+      setBoardScale((availableWidth * 0.9) / BOARD_SIZE)
+    })
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
 
   const startGame = (count) => {
     const initialPositions = Array(count).fill(0)
@@ -705,104 +722,114 @@ function App() {
   const maxRolls = playerCount * 30
   const rollsRemaining = maxRolls - rollCount
 
-  if (gamePhase === 'setup') {
-    return (
-      <div className="game-container">
-        <h1>Snakes & Ladders</h1>
-        <p className="coop-subtitle">Cooperative Team Game</p>
-        <div className="setup-screen">
-          <h2>How many players?</h2>
-          <p className="setup-rules">Get any player to 100 within shared rolls to win!</p>
-          <div className="player-select">
-            {[2, 3, 4].map(count => (
-              <button key={count} onClick={() => startGame(count)} className="player-count-btn">
-                {count} Players
-                <div className="player-preview">
-                  {PLAYER_COLORS.slice(0, count).join(' ')}
-                </div>
-                <div className="roll-preview">{count * 30} rolls</div>
-              </button>
+  return (
+    <div className="game-container">
+    <div class="the-game">
+      <div className="board-area">
+
+        <div className="board-scaler" ref={boardContainerRef} style={{ height: BOARD_SIZE * boardScale }}>
+          <div className="board-wrapper" style={{
+            transform: `scale(${boardScale})`,
+            transformOrigin: 'left',
+          }}>
+            <svg className="board-overlay" width={BOARD_SIZE} height={BOARD_SIZE}>
+              {Object.entries(SNAKES).map(([from, to]) => (
+                <Snake key={`snake-${from}`} from={Number(from)} to={to} />
+              ))}
+              {Object.entries(LADDERS).map(([from, to]) => (
+                <Ladder key={`ladder-${from}`} from={Number(from)} to={to} />
+              ))}
+            </svg>
+            <div className="board">
+              {renderBoard()}
+            </div>
+            {animatedPositions.map((pos, idx) => (
+              <PlayerToken
+                key={idx}
+                position={pos}
+                color={PLAYER_COLORS[idx]}
+                offset={getPlayerOffset(idx)}
+                isSliding={slidingPlayer === idx}
+              />
             ))}
           </div>
         </div>
       </div>
-    )
-  }
 
-  return (
-    <div className="game-container">
-      <h1>Snakes & Ladders</h1>
+      <div class="game-text">
+        <header>
+          <h1><span>Co-Operative</span><span>Snakes</span><span>&</span><span>Ladders</span></h1>
+        </header>
 
-      <div className="game-info">
-        {/* Roll counter */}
-        <div className={`roll-counter ${rollsRemaining <= 10 ? 'danger' : ''}`}>
-          <span className="roll-label">Rolls remaining:</span>
-          <span className="roll-value">{rollsRemaining}</span>
-        </div>
-
-        <div className="player-status">
-          {playerPositions.map((pos, idx) => (
-            <div
-              key={idx}
-              className={`player-info ${idx === currentPlayer && gamePhase === 'playing' ? 'active' : ''}`}
-            >
-              <span className="player-icon">{PLAYER_COLORS[idx]}</span>
-              <span className="player-name">{PLAYER_NAMES[idx]}</span>
-              <span className="player-pos">{pos || 'Start'}</span>
+      {gamePhase === 'setup' && (
+          <div className="setup-card">
+            <h2>How many players?</h2>
+            <p className="setup-rules">Get any player to 100 within shared rolls to win!</p>
+            <div className="player-select">
+              {[2, 3, 4].map(count => (
+                <button key={count} onClick={() => startGame(count)} className="player-count-btn">
+                  <div className="player-preview">
+                    {PLAYER_COLORS.slice(0, count).join(' ')}
+                  </div>
+                  {count} Players
+                  <div className="roll-preview">{count * 30} rolls</div>
+                </button>
+              ))}
             </div>
-          ))}
         </div>
+      )}
 
-        <div className="dice-area">
-          <div className={`dice ${isRolling ? 'rolling' : ''}`}>
-            {diceValue || '?'}
+
+        {gamePhase !== 'setup' && <div className="game-info">
+          {/* Roll counter */}
+          <p className="coop-subtitle">You are in a race against time to the end of the board before your rolls run out. Any player can take a leg up or a lift up from another player. </p>
+
+          <div className={`roll-counter ${rollsRemaining <= 10 ? 'danger' : ''}`}>
+            <span className="roll-label">Rolls remaining</span>
+            <span className="roll-value">{rollsRemaining}</span>
           </div>
-          {gamePhase === 'playing' && !showingLegUp && (
-            <button onClick={rollDice} disabled={isRolling}>
-              {isRolling ? 'Rolling...' : `${PLAYER_NAMES[currentPlayer]}: Roll`}
-            </button>
-          )}
-          {gamePhase === 'finished' && (
-            <button onClick={resetGame}>Play Again</button>
-          )}
-        </div>
-        {showingLegUp && (
-          <div className="leg-up-choice">
-            <button onClick={acceptBoost} className="leg-up-btn accept">Take it!</button>
-            <button onClick={declineLegUp} className="leg-up-btn decline">No thanks, roll instead</button>
+
+          <div className="player-status">
+            {playerPositions.map((pos, idx) => (
+              <div
+                key={idx}
+                className={`player-info ${idx === currentPlayer && gamePhase === 'playing' ? 'active' : ''}`}
+              >
+                <span className="player-icon">{PLAYER_COLORS[idx]}</span>
+                <span className="player-name">{PLAYER_NAMES[idx]}</span>
+              </div>
+            ))}
           </div>
-        )}
-        <p className="message">{message}</p>
-        {gameResult && (
-          <p className={`game-result ${gameResult}`}>
-            {gameResult === 'team' ? '🎉 Team Wins! 🎉' : '🐍 The Board Wins! 🐍'}
-          </p>
-        )}
+
+          <div className="dice-area">
+            {gamePhase === 'playing' && !showingLegUp && (
+              <button onClick={rollDice} disabled={isRolling}>
+                {isRolling ? 'Rolling...' : 'Roll the Die!'}
+              </button>
+            )}
+            <div className={`dice ${isRolling ? 'rolling' : ''}`}>
+              {diceValue || '?'}
+            </div>
+            {gamePhase === 'finished' && (
+              <button onClick={resetGame}>Play Again</button>
+            )}
+          </div>
+          {showingLegUp && (
+            <div className="leg-up-choice">
+              <button onClick={acceptBoost} className="leg-up-btn accept">Take it!</button>
+              <button onClick={declineLegUp} className="leg-up-btn decline">No thanks, roll instead</button>
+            </div>
+          )}
+          <p className="message">{message}</p>
+          {gameResult && (
+            <p className={`game-result ${gameResult}`}>
+              {gameResult === 'team' ? '🎉 Team Wins! 🎉' : '🐍 The Board Wins! 🐍'}
+            </p>
+          )}
+        </div>}
       </div>
 
-      <div className="board-wrapper">
-        <svg className="board-overlay" width={BOARD_SIZE} height={BOARD_SIZE}>
-          {Object.entries(LADDERS).map(([from, to]) => (
-            <Ladder key={`ladder-${from}`} from={Number(from)} to={to} />
-          ))}
-          {Object.entries(SNAKES).map(([from, to]) => (
-            <Snake key={`snake-${from}`} from={Number(from)} to={to} />
-          ))}
-        </svg>
-        <div className="board">
-          {renderBoard()}
-        </div>
-        {/* Animated player tokens */}
-        {animatedPositions.map((pos, idx) => (
-          <PlayerToken
-            key={idx}
-            position={pos}
-            color={PLAYER_COLORS[idx]}
-            offset={getPlayerOffset(idx)}
-            isSliding={slidingPlayer === idx}
-          />
-        ))}
-      </div>
+    </div>
     </div>
   )
 }

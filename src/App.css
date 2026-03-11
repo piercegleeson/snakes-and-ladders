@@ -1,31 +1,85 @@
 * {
   box-sizing: border-box;
 }
+body{
+  background:#2E3D4F;
+  color:#E8E2D9;
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+
+}
 
 #root {
-  max-width: 900px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 1rem;
+  max-width:1300px;
 }
 
 .game-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 1rem;
 }
 
+header{
+  display:flex;
+  flex-direction:space-between;
+  margin-bottom:3%;
+  width: 100%;
+  aspect-ratio: 3 / 1; /* ~33% height relative to width */
+
+}
 h1 {
   margin: 0;
-  color: #333;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size:96px;
+  line-height:80px;
+  position:relative;
+  width: 100%;
+  height: 100%;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
-
-.coop-subtitle {
-  margin: 0;
-  color: #666;
-  font-style: italic;
+h1 span{
+  position:absolute;
 }
+h1 span:nth-child(1){
+  color: #E8E2D9;
+  top: -2%;
+  left: 5.5%;
+  font-size: 46%;
+  line-height: 1;
+}
+h1 span:nth-child(2){
+  color: #8FAFC2;
+      z-index: 2;
+      top: 5%;
+      left: 0;
+      font-size: 100%;
+      line-height: 1;
+    }
+h1 span:nth-child(3){
+  color: #D4A5A0;
+  left: 53%;
+  top: -22%;
+  font-size: 183%;
+  line-height: 1;}
+h1 span:nth-child(4){
+  color: #E8E2D9;
+  top: 37%;
+  left: 11%;
+  font-size: 100%;
+  line-height: 1;
+  z-index: 3;}
 
+
+
+.the-game{
+  display:flex;
+  align-items:flex-start;
+}
 .setup-rules {
   margin: 0;
   color: #555;
@@ -58,7 +112,8 @@ h1 {
   gap: 0.5rem;
   padding: 1.5rem 2rem;
   font-size: 1.2rem;
-  background: #4CAF50;
+  background: transparent;
+  border:1px solid #D4A5A0;
   min-width: 140px;
 }
 
@@ -75,25 +130,35 @@ h1 {
   font-size: 0.85rem;
   opacity: 0.9;
 }
+.game-text{
+  flex:0 0 40%;
+
+}
 
 /* Game Info */
 .game-info {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: row;
+  flex-wrap:wrap;
+  gap: 40px 10px;
+  align-items:flex-start;
+  justify-content:space-between;
 }
+
+
+.coop-subtitle {
+  margin: 0;
+  flex:0 0 calc((100% * (4 / 7)) - 10px);
+  font-weight:600;
+}
+
 
 /* Roll Counter */
 .roll-counter {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1.5rem;
-  background: #e3f2fd;
-  border: 2px solid #2196F3;
-  border-radius: 8px;
-  font-size: 1.1rem;
+  flex-direction:column;
+  flex:0 0 calc((100% * (3 / 7)) - 10px);
+  align-items: flex-end;
 }
 
 .roll-counter.danger {
@@ -108,13 +173,21 @@ h1 {
 }
 
 .roll-label {
-  color: #555;
+  font-size:24px;
+  line-height:24px;
+  font-weight:700;
+  text-transform:uppercase;
+  text-align:right;
+  font-weight:900;
 }
 
 .roll-value {
   font-weight: bold;
-  font-size: 1.3rem;
-  color: #2196F3;
+  color: #D4A5A0;
+  font-size:96px;
+  line-height:84px;
+  font-family: "Cherry Bomb One", system-ui;
+
 }
 
 .roll-counter.danger .roll-value {
@@ -142,9 +215,10 @@ h1 {
 
 .player-status {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
+  gap: 10px;
+  flex-wrap:wrap;
+  justify-content: flex-start;
+
 }
 
 .player-info {
@@ -152,10 +226,12 @@ h1 {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #f0f0f0;
-  border-radius: 8px;
-  border: 2px solid transparent;
+  border-radius: 3px;
+  border:1px solid rgba(143,175,194,0.3);
   transition: all 0.2s;
+  flex:0 0 calc(25% - 10px);
+  color:#E8E2D9;
+  letter-spacing:0.08em;
 }
 
 .player-info.active {
@@ -180,20 +256,22 @@ h1 {
 }
 
 .player-name {
-  font-weight: bold;
-  color: #333;
+  font-weight: 900;
+  font-size:10px;
+  line-height:14px;
+  text-transform:uppercase;
+
 }
 
-.player-pos {
-  color: #666;
-  font-size: 0.9rem;
-}
 
 /* Dice */
 .dice-area {
   display: flex;
   align-items: center;
   gap: 1rem;
+  border:1px solid rgba(143,175,194,0.3);
+  width:100%;
+  padding:1rem;
 }
 
 .dice {
@@ -221,15 +299,18 @@ h1 {
 }
 
 button {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  padding: 1rem 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
-  background: #4CAF50;
-  color: white;
+  background: #8FAFC2;
+  color: #2E3D4F;
+  text-transform:uppercase;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  flex-grow:1;
+
 }
 
 button:hover:not(:disabled) {
@@ -279,7 +360,38 @@ button:disabled {
   background: #616161;
 }
 
+/* Board area wrapper (holds overlay + board) */
+.board-area {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex:0 0 60%;
+  aspect-ratio:1;
+}
+
+.setup-card {
+  padding:0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.setup-card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
 /* Board */
+.board-scaler {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items:center;
+}
+
 .board-wrapper {
   position: relative;
   overflow: visible;
@@ -296,8 +408,7 @@ button:disabled {
 .board {
   display: flex;
   flex-direction: column;
-  border: 3px solid #333;
-  border-radius: 8px;
+  border: 1px solid #333;
   overflow: hidden;
   position: relative;
 }
@@ -318,20 +429,20 @@ button:disabled {
   font-size: 0.7rem;
 }
 
-.square.color-green {
-  background: #7b7328;
+.square.color-grey {
+  background: #C8BFAD;
 }
 
-.square.color-red {
-  background: #ae3034;
+.square.color-pink {
+  background: #D4A5A0;
 }
 
 .square.color-blue {
-  background: #96ad99;
+  background: #8FAFC2;
 }
 
-.square.color-yellow {
-  background: #af8d36;
+.square.color-brown {
+  background: #6b7f8e;
 }
 /*
 .square:nth-child(odd) {
@@ -360,7 +471,7 @@ button:disabled {
 }
 */
 .board-row:not(:last-child) .square{
-  border-bottom:2px solid #000;
+  border-bottom:5px solid #2E3D4F;
 }
 .board-row:nth-child(odd) .square:last-child{
   border-bottom:0;
@@ -369,13 +480,16 @@ button:disabled {
   border-bottom:0;
 }
 
+.ladder-vertical {
+  filter: drop-shadow( 2px 2px 4px rgba(0, 0, 0, .3));
+}
 
 
 .square-number {
-  font-weight: bold;
-  color: #000;
   position: relative;
-  z-index: 5;
+  z-index: 0;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size:18px;
 }
 /*
 .snake-head {
